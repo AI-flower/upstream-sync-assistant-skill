@@ -1,0 +1,50 @@
+version: 1
+
+git:
+  upstream_remote: upstream
+  write_remote: origin
+  mirror_branch: main
+  integration_branch: yl-main
+  sync_branch_prefix: sync/upstream-
+
+policy:
+  require_clean_worktree: true
+  require_confirmation_for_push: true
+  require_confirmation_for_mirror_branch_change: true
+  block_push_to_upstream: true
+
+sync:
+  cadence_days: 7
+  freeze_windows:
+    - name: release-freeze
+      branches:
+        - yl-main
+
+analysis:
+  high_risk_paths:
+    - packages/happy-app
+    - packages/happy-server
+    - packages/happy-wire
+  high_risk_files:
+    - package.json
+    - yarn.lock
+  infra_keywords:
+    - package.json
+    - yarn.lock
+    - pod
+    - gradle
+    - docker
+    - migration
+    - env
+  customizations_registry: docs/upstream-sync/customizations.md
+
+validation:
+  post_merge_checks:
+    - yarn test
+  manual_checks:
+    - core login flow
+    - core session flow
+
+reporting:
+  output_dir: docs/upstream-sync/reports
+  pr_template: docs/upstream-sync/pr-template.md
